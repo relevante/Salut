@@ -1,5 +1,7 @@
 package com.peak.salut;
 
+import android.os.Handler;
+import android.os.Looper;
 import android.util.Log;
 
 import com.arasthel.asyncjob.AsyncJob;
@@ -13,10 +15,12 @@ public class BackgroundServerRegistrationJob implements AsyncJob.OnBackgroundJob
 
     private Salut salutInstance;
     private Socket clientSocket;
+    private Handler handler;
 
     public BackgroundServerRegistrationJob(Salut salutInstance, Socket clientSocket) {
         this.clientSocket = clientSocket;
         this.salutInstance = salutInstance;
+        handler = new Handler(Looper.getMainLooper());
     }
 
     @Override
@@ -50,7 +54,7 @@ public class BackgroundServerRegistrationJob implements AsyncJob.OnBackgroundJob
                 salutInstance.registeredClients.add(clientDevice);
 
                 if (salutInstance.onDeviceRegisteredWithHost != null) {
-                    salutInstance.dataReceiver.activity.runOnUiThread(new Runnable() {
+                    handler.post(new Runnable() {
                         @Override
                         public void run() {
                             salutInstance.onDeviceRegisteredWithHost.call(finalDevice);
