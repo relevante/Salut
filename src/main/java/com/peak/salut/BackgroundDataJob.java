@@ -1,5 +1,7 @@
 package com.peak.salut;
 
+import android.os.Handler;
+import android.os.Looper;
 import android.util.Log;
 
 import com.arasthel.asyncjob.AsyncJob;
@@ -15,10 +17,12 @@ public class BackgroundDataJob implements AsyncJob.OnBackgroundJob {
     private Salut salutInstance;
     private Socket clientSocket;
     private String data;
+    private Handler handler;
 
     public BackgroundDataJob(Salut salutInstance, Socket clientSocket) {
         this.clientSocket = clientSocket;
         this.salutInstance = salutInstance;
+        handler = new Handler(Looper.getMainLooper());
     }
 
 
@@ -35,7 +39,7 @@ public class BackgroundDataJob implements AsyncJob.OnBackgroundJob {
             Log.d(Salut.TAG, "\nSuccessfully received data.\n");
 
             if (!data.isEmpty()) {
-                salutInstance.dataReceiver.activity.runOnUiThread(new Runnable() {
+                handler.post(new Runnable() {
                     @Override
                     public void run() {
                         salutInstance.dataReceiver.dataCallback.onDataReceived(data);
